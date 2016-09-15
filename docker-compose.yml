@@ -1,0 +1,42 @@
+elasticsearch:
+  image: dtr.florentappointaire.cloud/fappointaire/elasticsearch
+  restart: always
+  environment:
+    - ES_HEAP_SIZE=1024m
+  command: elasticsearch -Des.network.host=0.0.0.0
+  volumes: 
+    - /etc/localtime:/etc/localtime
+  log_driver: "json-file"
+  log_opt:
+    max-size: "50m"
+    max-file: "100"
+  ports:
+    - "9200:9200"
+    - "9300:9300"
+logstash:
+  image: dtr.florentappointaire.cloud/fappointaire/logstash
+  restart: always
+  command: logstash -f /etc/logstash/conf.d/logstash.conf
+  volumes:
+    - /etc/localtime:/etc/localtime
+  log_driver: "json-file"
+  log_opt:
+    max-size: "50m"
+    max-file: "100"
+  ports:
+    - "5140:5140/udp"
+  links:
+    - elasticsearch
+kibana:
+  image: dtr.florentappointaire.cloud/fappointaire/kibana
+  restart: always
+  volumes:
+    - /etc/localtime:/etc/localtime
+  log_driver: "json-file"
+  log_opt:
+    max-size: "50m"
+    max-file: "100"
+  ports:
+    - "5601:5601"
+  links:
+    - elasticsearch
